@@ -1,0 +1,47 @@
+package rules;
+dialect  "mvel"
+
+import ftn.sbnz.SbnzProject.model.User
+import ftn.sbnz.SbnzProject.model.Activity
+
+rule "Calorie SEDENTARY"
+    when
+        u: User(activity == Activity.SEDENTARY)
+    then
+        u.setCalories(u.getBmr() * 1.2);
+end
+
+rule "Calorie LIGHT"
+    when
+        u: User(activity == Activity.LIGHT)
+    then
+        u.setCalories(u.getBmr() * 1.35);
+end
+
+rule "Calorie MODERATE"
+    when
+        u: User(activity == Activity.MODERATE)
+    then
+        u.setCalories(u.getBmr() * 1.5);
+end
+
+rule "Calorie ACTIVE"
+    when
+        u: User(activity == Activity.ACTIVE)
+    then
+        u.setCalories(u.getBmr() * 1.65);
+end
+
+rule "Calorie VERY_ACTIVE"
+    when
+        u: User(activity == Activity.VERY_ACTIVE)
+    then
+        u.setCalories(u.getBmr() * 1.8);
+end
+
+rule "Calorie EXTRA_ACTIVE"
+    when
+        u: User(activity == Activity.EXTRA_ACTIVE)
+    then
+        u.setCalories(u.getBmr() * 1.95);
+end

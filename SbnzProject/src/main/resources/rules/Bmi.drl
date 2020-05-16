@@ -1,0 +1,68 @@
+package rules;
+dialect  "mvel"
+
+import ftn.sbnz.SbnzProject.model.User
+
+rule "BMI"
+    when
+        u: User()
+    then
+        u.setBmi(u.getWeight() / Math.pow(u.getHeight() / 100, 2));
+        update(u)
+end
+
+rule "Body Status 1"
+    when
+        u: User(bmi < 15)
+    then
+        u.setBodyStatus("Very severely underweight");
+end
+
+rule "Body Status 2"
+    when
+        u: User(bmi >= 15 && bmi < 16)
+    then
+        u.setBodyStatus("Severely underweight");
+end
+
+rule "Body Status 3"
+    when
+        u: User(bmi >= 16 && bmi < 18.5)
+    then
+        u.setBodyStatus("Underweight");
+end
+
+rule "Body Status 4"
+    when
+        u: User(bmi > 18.5 && bmi < 25)
+    then
+        u.setBodyStatus("Normal (healthy weight)");
+end
+
+rule "Body Status 5"
+    when
+        u: User(bmi >= 25 && bmi < 30)
+    then
+        u.setBodyStatus("Overweight");
+end
+
+rule "Body Status 6"
+    when
+        u: User(bmi >= 30 && bmi < 35)
+    then
+        u.setBodyStatus("Moderately obese");
+end
+
+rule "Body Status 7"
+    when
+        u: User(bmi >= 35 && bmi < 40)
+    then
+        u.setBodyStatus("Severely obese");
+end
+
+rule "Body Status 8"
+    when
+        u: User(bmi >= 40)
+    then
+        u.setBodyStatus("Very severely obese");
+end
