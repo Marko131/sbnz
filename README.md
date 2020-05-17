@@ -11,4 +11,6 @@ Pokrenuti Android Virutal Device
 npm install
 npx react-native run-android
 ```
+[Video za prvu kontrolnu tacku](https://drive.google.com/open?id=1rwmIowpDgBIyNw3kzVKE-ZZ7YDmhgwXX)
+
 ![Screenshot](https://raw.githubusercontent.com/Marko131/sbnz/master/SbnzMobile/screen.png)
