@@ -11,6 +11,7 @@ import {Text, AsyncStorage, Button} from 'react-native';
 import HomePage from './components/HomePage';
 import LoginPage from './components/LoginPage';
 import {Router, Stack, Scene} from 'react-native-router-flux';
+import RegisterPage from './components/RegisterPage';
 const App = () => {
   const [accessToken, setAccessToken] = useState(null);
 
@@ -19,6 +20,7 @@ const App = () => {
       <Stack key="root">
         <Scene key="home" component={HomePage} hideNavBar={true} />
         <Scene key="login" component={LoginPage} hideNavBar={true} />
+        <Scene key="register" component={RegisterPage} hideNavBar={true} />
       </Stack>
     </Router>
   );
