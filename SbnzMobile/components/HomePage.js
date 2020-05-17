@@ -37,7 +37,7 @@ const HomePage = () => {
           headers: {'X-Auth-Token': value},
         })
           .then(response => setProfile(response.data))
-          .catch(error => alert(error));
+          .catch(error => Actions.replace('login'));
       } else {
         Actions.replace('login');
       }
