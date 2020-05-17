@@ -97,7 +97,11 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
+		<dependency>
+			<groupId>org.kie</groupId>
+			<artifactId>kie-spring</artifactId>
+			<version>7.37.0.Final</version>
+		</dependency>
 
 
 		<dependency>
@@ -105,6 +109,13 @@
             <artifactId>jjwt</artifactId>
             <version>0.4</version>
         </dependency>
+
+		<dependency>
+			<groupId>sbnz.integracija</groupId>
+			<artifactId>drools-spring-kjar</artifactId>
+			<type>jar</type>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 
     </dependencies>

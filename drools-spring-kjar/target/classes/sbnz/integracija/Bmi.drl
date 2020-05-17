@@ -1,5 +1,4 @@
-package rules;
-dialect  "mvel"
+package sbnz.integracija;
 
 import ftn.sbnz.SbnzProject.model.User
 
