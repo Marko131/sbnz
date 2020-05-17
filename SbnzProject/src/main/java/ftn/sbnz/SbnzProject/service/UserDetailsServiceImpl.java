@@ -29,6 +29,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private KieContainer kieContainer;
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email){
@@ -50,9 +53,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (userRepository.findByEmail(user.getEmail()) != null) throw new UserAlreadyExistsException();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        KieServices ks = KieServices.Factory.get();
-        KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession kSession = kContainer.newKieSession("ksession-rules");
+        KieSession kSession = kieContainer.newKieSession();
 
         kSession.insert(user);
         kSession.fireAllRules();
@@ -63,8 +64,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public User findUserByEmail(String email){
         return userRepository.findByEmail(email);
     }
-
-
-
 
 }

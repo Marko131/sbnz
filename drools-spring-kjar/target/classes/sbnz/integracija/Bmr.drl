@@ -1,14 +1,31 @@
-package rules;
-dialect  "mvel"
+package sbnz.integracija;
 
 import ftn.sbnz.SbnzProject.model.User
+import ftn.sbnz.SbnzProject.model.Gender
 import ftn.sbnz.SbnzProject.model.Activity
+
+rule "BMR Female"
+    when
+        u: User(gender == Gender.FEMALE)
+    then
+        u.setBmr(9.247 * u.getWeight() + 3.098 * u.getHeight() - 4.33 * u.getAge() + 447.593);
+        update(u)
+end
+
+rule "BMR Male"
+    when
+        u: User(gender == Gender.MALE)
+    then
+        u.setBmr(13.397 * u.getWeight() + 4.799 * u.getHeight() - 5.677 * u.getAge() + 88.362);
+        update(u)
+end
 
 rule "Calorie SEDENTARY"
     when
         u: User(activity == Activity.SEDENTARY)
     then
         u.setCalories(u.getBmr() * 1.2);
+        update(u);
 end
 
 rule "Calorie LIGHT"
@@ -16,6 +33,7 @@ rule "Calorie LIGHT"
         u: User(activity == Activity.LIGHT)
     then
         u.setCalories(u.getBmr() * 1.35);
+        update(u);
 end
 
 rule "Calorie MODERATE"
@@ -23,6 +41,7 @@ rule "Calorie MODERATE"
         u: User(activity == Activity.MODERATE)
     then
         u.setCalories(u.getBmr() * 1.5);
+        update(u);
 end
 
 rule "Calorie ACTIVE"
@@ -30,6 +49,7 @@ rule "Calorie ACTIVE"
         u: User(activity == Activity.ACTIVE)
     then
         u.setCalories(u.getBmr() * 1.65);
+        update(u);
 end
 
 rule "Calorie VERY_ACTIVE"
@@ -37,6 +57,7 @@ rule "Calorie VERY_ACTIVE"
         u: User(activity == Activity.VERY_ACTIVE)
     then
         u.setCalories(u.getBmr() * 1.8);
+        update(u);
 end
 
 rule "Calorie EXTRA_ACTIVE"
@@ -44,4 +65,5 @@ rule "Calorie EXTRA_ACTIVE"
         u: User(activity == Activity.EXTRA_ACTIVE)
     then
         u.setCalories(u.getBmr() * 1.95);
+        update(u);
 end
