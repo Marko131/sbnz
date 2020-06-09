@@ -1,0 +1,160 @@
+package sbnz.integracija;
+dialect  "mvel"
+
+import ftn.sbnz.SbnzProject.model.Meal
+import ftn.sbnz.SbnzProject.model.Message
+import ftn.sbnz.SbnzProject.model.Day
+import ftn.sbnz.SbnzProject.model.User
+import ftn.sbnz.SbnzProject.model.Ingredient
+import java.util.List
+import java.util.ArrayList;
+
+declare LessCaloireMealEvent
+    @role(event)
+end
+
+declare MoreCaloireMealEvent
+    @role(event)
+end
+
+declare MacroNutrients
+    fat: Double;
+    carb: Double;
+    protein: Double;
+end
+
+// Total calories
+rule "Less Calorie Meal"
+agenda-group "meal"
+    when
+        $meal: Meal($ingredients: ingredients)
+        Number(doubleValue < 150) from accumulate(
+            Ingredient(
+                $kcal: food.calories / 100 * gram
+            ) from $ingredients,
+            sum($kcal)
+        )
+    then
+        insert(new LessCaloireMealEvent())
+end
+
+rule "More Calorie Meal"
+agenda-group "meal"
+    when
+        $meal: Meal($ingredients: ingredients)
+        Number(doubleValue > 900) from accumulate(
+            Ingredient(
+                $kcal: food.calories / 100 * gram
+            ) from $ingredients,
+            sum($kcal)
+        )
+    then
+        insert(new MoreCaloireMealEvent())
+end
+
+rule "Warn user for less calorie meals"
+agenda-group "meal"
+    when
+        LessCaloireMealEvent()
+        Number(intValue >= 2 ) from accumulate(
+            $e: LessCaloireMealEvent(),
+            count($e)
+            )
+        $messages: ArrayList();
+    then
+        $messages.add(new Message("WARNING: Get more calories per meal"));
+end
+
+rule "Warn user for more calorie meals"
+agenda-group "meal"
+    when
+        MoreCaloireMealEvent()
+        Number(intValue >= 2 ) from accumulate(
+            $e: MoreCaloireMealEvent(),
+            count($e)
+            )
+        $messages: ArrayList();
+    then
+        $messages.add(new Message("WARNING: Get less calories per meal"));
+end
+
+//Macro ratio
+rule "Calculate macro"
+agenda-group "check-meal"
+when
+    $meal: Meal($ingredients: ingredients)
+    $fat: Number() from accumulate(
+        Ingredient(
+        $f: food.getFat() / 100 * gram
+        ) from $ingredients,
+        sum($f)
+    )
+    $carb: Number() from accumulate(
+        Ingredient(
+        $c: food.getCarb() / 100 * gram
+        ) from $ingredients,
+        sum($c)
+    )
+    $protein: Number() from accumulate(
+        Ingredient(
+        $p: food.getProtein() / 100 * gram
+        ) from $ingredients,
+        sum($p)
+    )
+    then
+        insert(new MacroNutrients($fat, $carb, $protein));
+end
+
+rule "Macro ratio more carb"
+agenda-group "check-meal"
+    when
+        $messages: ArrayList();
+        MacroNutrients(carb / (carb+fat+protein) < 0.45)
+    then
+        $messages.add(new Message("Get more carb"));
+end
+
+rule "Macro ratio less carb"
+agenda-group "check-meal"
+    when
+        $messages: ArrayList();
+        MacroNutrients(carb / (carb+fat+protein) > 0.6)
+    then
+        $messages.add(new Message("Get less carb"));
+end
+
+rule "Macro ratio more fat"
+agenda-group "check-meal"
+    when
+        $messages: ArrayList();
+        MacroNutrients(fat / (carb+fat+protein) < 0.2)
+    then
+        $messages.add(new Message("Get more fat"));
+end
+
+rule "Macro ratio less fat"
+agenda-group "check-meal"
+    when
+        $messages: ArrayList();
+        MacroNutrients(fat / (carb+fat+protein) > 0.35)
+    then
+        $messages.add(new Message("Get less fat"));
+end
+
+rule "Macro ratio more protein"
+agenda-group "check-meal"
+    when
+        $messages: ArrayList();
+        MacroNutrients(protein / (carb+fat+protein) < 0.1)
+    then
+        $messages.add(new Message("Get more protein"));
+end
+
+rule "Macro ratio less protein"
+agenda-group "check-meal"
+    when
+        $messages: ArrayList();
+        MacroNutrients(protein / (carb+fat+protein) > 0.35)
+    then
+        $messages.add(new Message("Get less protein"));
+end

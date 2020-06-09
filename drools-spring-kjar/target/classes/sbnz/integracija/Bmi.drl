@@ -2,7 +2,7 @@ package sbnz.integracija;
 
 import ftn.sbnz.SbnzProject.model.User
 
-rule "BMI"
+rule "BMI" salience 20
     when
         u: User()
     then
@@ -10,56 +10,56 @@ rule "BMI"
         update(u)
 end
 
-rule "Body Status 1"
+rule "Body Status 1" salience 10
     when
         u: User(bmi < 15)
     then
         u.setBodyStatus("Very severely underweight");
 end
 
-rule "Body Status 2"
+rule "Body Status 2" salience 10
     when
         u: User(bmi >= 15 && bmi < 16)
     then
         u.setBodyStatus("Severely underweight");
 end
 
-rule "Body Status 3"
+rule "Body Status 3" salience 10
     when
         u: User(bmi >= 16 && bmi < 18.5)
     then
         u.setBodyStatus("Underweight");
 end
 
-rule "Body Status 4"
+rule "Body Status 4" salience 10
     when
         u: User(bmi > 18.5 && bmi < 25)
     then
         u.setBodyStatus("Normal (healthy weight)");
 end
 
-rule "Body Status 5"
+rule "Body Status 5" salience 10
     when
         u: User(bmi >= 25 && bmi < 30)
     then
         u.setBodyStatus("Overweight");
 end
 
-rule "Body Status 6"
+rule "Body Status 6" salience 10
     when
         u: User(bmi >= 30 && bmi < 35)
     then
         u.setBodyStatus("Moderately obese");
 end
 
-rule "Body Status 7"
+rule "Body Status 7" salience 10
     when
         u: User(bmi >= 35 && bmi < 40)
     then
         u.setBodyStatus("Severely obese");
 end
 
-rule "Body Status 8"
+rule "Body Status 8" salience 10
     when
         u: User(bmi >= 40)
     then

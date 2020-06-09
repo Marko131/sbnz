@@ -23,6 +23,8 @@ const HomePage = () => {
   const [profile, setProfile] = useState(new Object());
   const [date, setDate] = useState(new Date());
   const [expand, setExpand] = useState(true);
+  const [day, setDay] = useState({});
+  const [macro, setMacro] = useState({});
 
   useEffect(() => {
     _retrieveData();
@@ -38,6 +40,11 @@ const HomePage = () => {
         })
           .then(response => setProfile(response.data))
           .catch(error => Actions.replace('login'));
+        Axios.get('http://10.0.2.2:8080/meal/day', {
+          headers: {'X-Auth-Token': value},
+        })
+          .then(response => setDay(response.data))
+          .catch(error => alert(error));
       } else {
         Actions.replace('login');
       }
@@ -46,6 +53,7 @@ const HomePage = () => {
       Actions.replace('login');
     }
   };
+
   return (
     <SafeAreaView style={styles.body}>
       <View
@@ -77,7 +85,7 @@ const HomePage = () => {
           </View>
 
           <View style={{flex: 1, marginHorizontal: 10}}>
-            <CalorieCounter />
+            <CalorieCounter profile={profile} day={day} />
           </View>
 
           <View
@@ -91,12 +99,12 @@ const HomePage = () => {
           </View>
         </View>
 
-        <MacroContainer />
+        <MacroContainer profile={profile} day={day} />
 
         <Navigation />
       </View>
 
-      <MealsContainer />
+      <MealsContainer day={day} />
     </SafeAreaView>
   );
 };

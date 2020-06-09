@@ -1,12 +1,16 @@
 package ftn.sbnz.SbnzProject.controller;
 
+import ftn.sbnz.SbnzProject.dto.DroolsDTO;
 import ftn.sbnz.SbnzProject.dto.LoginUserDTO;
 import ftn.sbnz.SbnzProject.dto.RegisterUserDTO;
 import ftn.sbnz.SbnzProject.dto.UserProfileDTO;
 import ftn.sbnz.SbnzProject.exceptions.PasswordsDoNotMatchException;
+import ftn.sbnz.SbnzProject.model.Day;
 import ftn.sbnz.SbnzProject.model.User;
 import ftn.sbnz.SbnzProject.security.TokenUtils;
+import ftn.sbnz.SbnzProject.service.MealService;
 import ftn.sbnz.SbnzProject.service.UserDetailsServiceImpl;
+import org.apache.maven.shared.invoker.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +25,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
 @RestController
 public class UserController {
     @Autowired
@@ -29,6 +38,9 @@ public class UserController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private MealService mealService;
 
     @Autowired
     TokenUtils tokenUtils;
@@ -69,6 +81,8 @@ public class UserController {
     public ResponseEntity<UserProfileDTO> profile(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userDetailsService.findUserByEmail(email);
+        Day day = mealService.getDay(user);
+
         UserProfileDTO userProfileDTO = new UserProfileDTO(
                 user.getEmail(),
                 user.getFirstName(),
@@ -85,4 +99,28 @@ public class UserController {
         );
         return new ResponseEntity<UserProfileDTO>(userProfileDTO, HttpStatus.OK);
     }
+
+
+
+    @PostMapping("/drl")
+    public void addDrl(@RequestBody DroolsDTO droolsDTO) throws FileNotFoundException, MavenInvocationException {
+        String path = "..\\drools-spring-kjar\\src\\main\\resources\\sbnz\\integracija\\" + droolsDTO.getFileName() + ".drl";
+        PrintWriter out = new PrintWriter(new File(path));
+        out.println(droolsDTO.getText());
+        out.close();
+        cleanInstall();
+    }
+
+    private void cleanInstall () throws RuntimeException, MavenInvocationException {
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setPomFile( new File( "..\\drools-spring-kjar\\pom.xml" ) );
+        ArrayList<String> goals = new ArrayList<String>();
+        goals.add("clean");
+        goals.add("install");
+        request.setGoals(goals);
+        Invoker invoker = new DefaultInvoker();
+        invoker.setMavenHome(new File(System.getenv("M2_HOME")));
+        invoker.execute( request );
+    }
+
 }
