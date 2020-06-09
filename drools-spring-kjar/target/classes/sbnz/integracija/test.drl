@@ -1,0 +1,1 @@
+rule "Query" when then System.out.println("test query"); end

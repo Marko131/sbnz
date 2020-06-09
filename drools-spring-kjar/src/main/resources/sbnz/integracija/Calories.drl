@@ -1,0 +1,55 @@
+package sbnz.integracija;
+dialect  "mvel"
+
+import ftn.sbnz.SbnzProject.model.User
+
+rule "Calories 1" salience 5
+    when
+        $u: User(getCalories() > 0, getBmi() < 10)
+    then
+        $u.setCalories($u.getCalories() * 1.25);
+end
+
+rule "Calories 2" salience 5
+    when
+        $u: User(getCalories() > 0, getBmi() >= 15 && getBmi() < 16)
+    then
+        $u.setCalories($u.getCalories() * 1.20);
+end
+
+rule "Calories 3" salience 5
+    when
+        $u: User(getCalories() > 0, getBmi() >= 16 && getBmi() < 18.5)
+    then
+        $u.setCalories($u.getCalories() * 1.1);
+end
+
+rule "Calories 4" salience 5
+    when
+        $u: User(getCalories() > 0, getBmi() >= 25 && getBmi() < 30)
+    then
+        $u.setCalories($u.getCalories() * 0.9);
+end
+
+rule "Calories 5" salience 5
+    when
+        $u: User(getCalories() > 0, getBmi() >= 30 && getBmi() < 35)
+    then
+        $u.setCalories($u.getCalories() * 0.85);
+end
+
+
+rule "Calories 6" salience 5
+    when
+        $u: User(getCalories() > 0, getBmi() >= 35 && getBmi() < 40)
+    then
+        $u.setCalories($u.getCalories() * 0.8);
+end
+
+
+rule "Calories 7" salience 5
+    when
+        $u: User(getCalories() > 0, getBmi() >= 40)
+    then
+        $u.setCalories($u.getCalories() * 0.75);
+end

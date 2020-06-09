@@ -4,7 +4,7 @@ import ftn.sbnz.SbnzProject.model.User
 import ftn.sbnz.SbnzProject.model.Gender
 import ftn.sbnz.SbnzProject.model.Activity
 
-rule "BMR Female"
+rule "BMR Female" salience 20
     when
         u: User(gender == Gender.FEMALE)
     then
@@ -12,7 +12,7 @@ rule "BMR Female"
         update(u)
 end
 
-rule "BMR Male"
+rule "BMR Male" salience 20
     when
         u: User(gender == Gender.MALE)
     then
@@ -20,7 +20,7 @@ rule "BMR Male"
         update(u)
 end
 
-rule "Calorie SEDENTARY"
+rule "Calorie SEDENTARY" salience 10
     when
         u: User(activity == Activity.SEDENTARY)
     then
@@ -28,7 +28,7 @@ rule "Calorie SEDENTARY"
         update(u);
 end
 
-rule "Calorie LIGHT"
+rule "Calorie LIGHT" salience 10
     when
         u: User(activity == Activity.LIGHT)
     then
@@ -36,7 +36,7 @@ rule "Calorie LIGHT"
         update(u);
 end
 
-rule "Calorie MODERATE"
+rule "Calorie MODERATE" salience 10
     when
         u: User(activity == Activity.MODERATE)
     then
@@ -44,7 +44,7 @@ rule "Calorie MODERATE"
         update(u);
 end
 
-rule "Calorie ACTIVE"
+rule "Calorie ACTIVE" salience 10
     when
         u: User(activity == Activity.ACTIVE)
     then
@@ -52,7 +52,7 @@ rule "Calorie ACTIVE"
         update(u);
 end
 
-rule "Calorie VERY_ACTIVE"
+rule "Calorie VERY_ACTIVE" salience 10
     when
         u: User(activity == Activity.VERY_ACTIVE)
     then
@@ -60,7 +60,7 @@ rule "Calorie VERY_ACTIVE"
         update(u);
 end
 
-rule "Calorie EXTRA_ACTIVE"
+rule "Calorie EXTRA_ACTIVE" salience 10
     when
         u: User(activity == Activity.EXTRA_ACTIVE)
     then

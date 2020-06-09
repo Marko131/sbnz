@@ -1,0 +1,14 @@
+package sbnz.integracija;
+dialect  "mvel"
+
+import ftn.sbnz.SbnzProject.model.Meal
+
+rule "Query"
+    when
+    then
+        System.out.println("test query");
+end
+
+query "people over the age of 30"
+    $meal : Meal(getId() > 5)
+end

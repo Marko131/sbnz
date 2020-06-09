@@ -1,6 +1,7 @@
 package ftn.sbnz.SbnzProject.model;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table
@@ -186,4 +187,13 @@ public class User {
                 ", activity=" + activity +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id.equals(user.id);
+    }
+
 }
