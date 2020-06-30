@@ -1,19 +1,32 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableHighlight,
-  TouchableOpacity,
-} from 'react-native';
+import {View, StyleSheet, ToastAndroid} from 'react-native';
 import NavigationItem from './NavigationItem';
-const Navigation = () => {
+import AsyncStorage from '@react-native-community/async-storage';
+import {Actions} from 'react-native-router-flux';
+import Notifications from './Notifications';
+
+const Navigation = props => {
+  const logout = () => {
+    AsyncStorage.removeItem('access_token');
+    Actions.replace('login');
+  };
   return (
     <View style={styles.container}>
-      <NavigationItem icon="account" />
-      <NavigationItem icon="chart-bar" />
-      <NavigationItem icon="food-variant" />
-      <NavigationItem icon="settings" />
+      {/* <NavigationItem icon="chart-bar" /> */}
+      <NavigationItem
+        icon="account"
+        click={() => ToastAndroid.show('Profile', ToastAndroid.SHORT)}
+      />
+      <NavigationItem
+        icon="food-variant"
+        click={() => props.setDefaultView()}
+      />
+      <NavigationItem
+        icon="android-messages"
+        click={() => props.changeView(<Notifications />)}
+      />
+      <NavigationItem icon="refresh" click={props.refresh} />
+      <NavigationItem icon="logout" click={logout} />
     </View>
   );
 };

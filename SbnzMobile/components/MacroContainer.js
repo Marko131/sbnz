@@ -1,70 +1,56 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import MacroProgress from './MacroProgress';
-import Axios from 'axios';
 
 const width = 100;
 
 const MacroContainer = props => {
-  console.log(props);
-  const calculateMacro = (day, profile) => {
-    let fatTotal = profile.calories / 4 / 9;
-    let carbTotal = profile.calories / 3 / 9;
-    let proteinTotal = profile.calories / 3 / 9;
+  const [protein, setProtein] = useState(0);
+  const [fat, setFat] = useState(0);
+  const [carbs, setCarbs] = useState(0);
+  const [proteinProgress, setProteinProgress] = useState(0);
+  const [fatProgress, setFatProgress] = useState(0);
+  const [carbsProgress, setCarbsProgress] = useState(0);
 
-    let fat = profile.calories / 4 / 9;
-    let carb = profile.calories / 3 / 9;
-    let protein = profile.calories / 3 / 9;
+  useEffect(() => {
+    if (props.day.user) {
+      let fIntake = 0;
+      let f = parseInt(props.day.user.calories / 4 / 9);
+      let cIntake = 0;
+      let c = parseInt(props.day.user.calories / 2 / 4);
+      let pIntake = 0;
+      let p = parseInt(props.day.user.calories / 4 / 4);
 
-    day.meals
-      ? day.meals.forEach(meal => {
-          meal.ingredients.forEach(ingredient => {
-            fat -= (ingredient.food.fat / 100) * ingredient.gram;
-            carb -= (ingredient.food.carb / 100) * ingredient.gram;
-            protein -= (ingredient.food.protein / 100) * ingredient.gram;
-          });
-        })
-      : null;
-    const obj = {
-      protein: parseInt(protein),
-      fat: parseInt(fat),
-      carb: parseInt(carb),
-      proteinProgress: (proteinTotal - protein) / proteinTotal,
-      fatProgress: (fatTotal - fat) / fatTotal,
-      carbProgress: (carbTotal - carb) / carbTotal,
-    };
-    console.log(obj);
-    return obj;
-  };
+      props.day.mealRecipes.forEach(m => (fIntake += m.fat));
+      props.day.mealRecipes.forEach(m => (pIntake += m.protein));
+      props.day.mealRecipes.forEach(m => (cIntake += m.carbohydrates));
+
+      setProtein(p - parseInt(pIntake));
+      setCarbs(c - parseInt(cIntake));
+      setFat(f - parseInt(fIntake));
+
+      setCarbsProgress(cIntake / c);
+      setProteinProgress(pIntake / p);
+      setFatProgress(fIntake / f);
+    }
+  }, [props]);
   return (
     <View style={styles.container}>
       <MacroProgress
         macro="CARBS"
-        progress={
-          props.day.meals
-            ? calculateMacro(props.day, props.profile).carbProgress
-            : 0
-        }
-        grams={calculateMacro(props.day, props.profile).carb}
+        progress={carbsProgress}
+        grams={carbs}
         marginTop={-30}
       />
       <MacroProgress
         macro="PROTEIN"
-        progress={
-          props.day.meals
-            ? calculateMacro(props.day, props.profile).proteinProgress
-            : 0
-        }
-        grams={calculateMacro(props.day, props.profile).protein}
+        progress={proteinProgress}
+        grams={protein}
       />
       <MacroProgress
         macro="FAT"
-        progress={
-          props.day.meals
-            ? calculateMacro(props.day, props.profile).fatProgress
-            : 0
-        }
-        grams={calculateMacro(props.day, props.profile).fat}
+        progress={fatProgress}
+        grams={fat}
         marginTop={-30}
       />
     </View>

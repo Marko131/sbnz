@@ -1,12 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  SafeAreaView,
-  View,
-  StyleSheet,
-  Text,
-  Button,
-  Dimensions,
-} from 'react-native';
+import {SafeAreaView, View, StyleSheet, Text, Dimensions} from 'react-native';
 import CalorieCounter from './CalorieCounter';
 import MacroContainer from './MacroContainer';
 import Navigation from './Navigation';
@@ -22,9 +15,8 @@ const HomePage = () => {
   const [accessToken, setAccessToken] = useState(null);
   const [profile, setProfile] = useState(new Object());
   const [date, setDate] = useState(new Date());
-  const [expand, setExpand] = useState(true);
   const [day, setDay] = useState({});
-  const [macro, setMacro] = useState({});
+  const [view, setView] = useState(null);
 
   useEffect(() => {
     _retrieveData();
@@ -40,10 +32,15 @@ const HomePage = () => {
         })
           .then(response => setProfile(response.data))
           .catch(error => Actions.replace('login'));
-        Axios.get('http://10.0.2.2:8080/meal/day', {
+        Axios.get('http://10.0.2.2:8080/day/meal', {
           headers: {'X-Auth-Token': value},
         })
-          .then(response => setDay(response.data))
+          .then(response => {
+            setDay(response.data);
+            setView(
+              <MealsContainer day={response.data} refresh={_retrieveData} />,
+            );
+          })
           .catch(error => alert(error));
       } else {
         Actions.replace('login');
@@ -56,30 +53,11 @@ const HomePage = () => {
 
   return (
     <SafeAreaView style={styles.body}>
-      <View
-        style={{
-          backgroundColor: '#353535',
-          borderBottomLeftRadius: 600,
-          borderBottomRightRadius: 600,
-          width: 950,
-          alignSelf: 'center',
-        }}>
+      <View style={styles.topBackground}>
         <Text style={styles.text}>CLASSIC DIETING</Text>
 
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            width: screenWidth,
-            alignSelf: 'center',
-          }}>
-          <View
-            style={{
-              flex: 1,
-              display: 'flex',
-              justifyContent: 'center',
-            }}>
+        <View style={styles.container}>
+          <View style={styles.bodyStatus}>
             <Text style={styles.sideTitle}>{'BODY \nSTATUS'}</Text>
             <Text style={styles.sideText}>{profile.bodyStatus}</Text>
           </View>
@@ -88,28 +66,53 @@ const HomePage = () => {
             <CalorieCounter profile={profile} day={day} />
           </View>
 
-          <View
-            style={{
-              flex: 1,
-              display: 'flex',
-              justifyContent: 'center',
-            }}>
+          <View style={styles.totalCalories}>
             <Text style={styles.sideTitle}>{'TOTAL \nCALORIES'}</Text>
             <Text style={styles.sideText}>{parseInt(profile.calories)}</Text>
           </View>
         </View>
 
-        <MacroContainer profile={profile} day={day} />
+        <MacroContainer day={day} />
 
-        <Navigation />
+        <Navigation
+          refresh={_retrieveData}
+          changeView={view => setView(view)}
+          setDefaultView={() =>
+            setView(<MealsContainer day={day} refresh={_retrieveData} />)
+          }
+        />
       </View>
 
-      <MealsContainer day={day} />
+      {view}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: screenWidth,
+    alignSelf: 'center',
+  },
+  bodyStatus: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  totalCalories: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  topBackground: {
+    backgroundColor: '#353535',
+    borderBottomLeftRadius: 600,
+    borderBottomRightRadius: 600,
+    width: 950,
+    alignSelf: 'center',
+  },
   body: {
     flex: 1,
     backgroundColor: '#1b1b1b',

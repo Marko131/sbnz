@@ -3,6 +3,7 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<kbase name="meals" packages="sbnz.integracija" eventProcessingMode="stream" equalsBehavior="equality">
 		<ksession name="meal-session" />
+		<ksession name="day-session" />
 		<ksession name="user-session" default="true" />
 	</kbase>
 

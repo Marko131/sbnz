@@ -11,20 +11,39 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Axios from 'axios';
 import IngredientInput from './IngredientInput';
+import AsyncStorage from '@react-native-community/async-storage';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const AddMealModal = props => {
-  const [ingredients, setIngredients] = useState([{}]);
+  const [searchValue, setSearchValue] = useState('');
+  const [meals, setMeals] = useState([]);
 
-  const addIngredient = () => {
-    setIngredients([...ingredients, {}]);
+  const searchMeals = async () => {
+    const value = await AsyncStorage.getItem('access_token');
+    if (value !== null) {
+      Axios.get(`http://10.0.2.2:8080/day/meal/search/${searchValue}`, {
+        headers: {'X-Auth-Token': value},
+      })
+        .then(response => setMeals(response.data))
+        .catch(error => alert(error));
+    }
   };
 
-  const submitMeal = () => {
-    alert(submit);
+  const submitMeal = async id => {
+    const value = await AsyncStorage.getItem('access_token');
+    if (value !== null) {
+      Axios.post(
+        `http://10.0.2.2:8080/day/meal/${id}`,
+        {},
+        {
+          headers: {'X-Auth-Token': value},
+        },
+      )
+        .then(response => props.addMealToList(response.data))
+        .catch(error => alert(error));
+    }
   };
 
-  const items = () =>
-    ingredients.map((i, index) => <IngredientInput key={index} />);
   return (
     <TouchableWithoutFeedback onPress={() => props.hideModal(false)}>
       <View style={styles.centeredView}>
@@ -38,18 +57,37 @@ const AddMealModal = props => {
                 flexDirection: 'row',
                 alignItems: 'center',
               }}>
-              <TouchableOpacity onPress={addIngredient}>
+              <TextInput
+                placeholder="Search meals..."
+                value={searchValue}
+                onChangeText={value => setSearchValue(value)}
+                style={styles.input}
+              />
+              <TouchableOpacity onPress={searchMeals}>
                 <Icon name="search" size={25} color="#353535" />
               </TouchableOpacity>
             </View>
 
-            {items()}
-
             <TouchableHighlight
-              style={{...styles.openButton, backgroundColor: '#2196F3'}}
+              style={{
+                ...styles.openButton,
+                backgroundColor: '#2196F3',
+                marginTop: 30,
+              }}
               onPress={() => props.hideModal(false)}>
-              <Text style={styles.textStyle}>Hide Modal</Text>
+              <Text style={styles.textStyle}>Close</Text>
             </TouchableHighlight>
+
+            <ScrollView>
+              {meals.map((meal, index) => (
+                <View key={index} style={styles.searchItem}>
+                  <Text>{meal.name}</Text>
+                  <TouchableOpacity onPress={() => submitMeal(meal.id)}>
+                    <Icon name="add" size={25} color="#353535" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
           </View>
         </TouchableWithoutFeedback>
       </View>
@@ -79,7 +117,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    width: '70%',
+    width: '80%',
   },
   openButton: {
     backgroundColor: '#F194FF',
@@ -95,6 +133,18 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  input: {
+    width: '100%',
+    backgroundColor: '#fafafa',
+    borderRadius: 50,
+    padding: 10,
+  },
+  searchItem: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
   },
 });
 

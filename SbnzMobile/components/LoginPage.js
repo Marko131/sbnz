@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   Text,
+  ToastAndroid,
 } from 'react-native';
 import {Actions} from 'react-native-router-flux';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -19,18 +20,29 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
 
   const login = () => {
+    if (email === '') {
+      ToastAndroid.show('Email is required !', ToastAndroid.SHORT);
+      return;
+    }
+    if (password === '') {
+      ToastAndroid.show('Password is required !', ToastAndroid.SHORT);
+      return;
+    }
     Axios.post('http://10.0.2.2:8080/login', {
       email: email,
       password: password,
     })
       .then(response => {
-        console.log(response.data);
-
         AsyncStorage.setItem('access_token', response.data)
           .then(() => Actions.replace('home'))
           .catch(error => alert(error));
       })
-      .catch(error => alert(error));
+      .catch(error =>
+        ToastAndroid.show(
+          'Email or password is incorrect !',
+          ToastAndroid.SHORT,
+        ),
+      );
   };
   return (
     <View style={styles.container}>
