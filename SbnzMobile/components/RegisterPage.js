@@ -5,7 +5,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  ToastAndroid,
 } from 'react-native';
 import {Picker} from '@react-native-community/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -31,29 +31,66 @@ const RegisterPage = () => {
       password2: password2,
       firstName: firstName,
       lastName: lastName,
-      age: age,
+      age: +age,
       gender: gender,
-      height: height,
-      weight: weight,
+      height: +height,
+      weight: +weight,
       activity: activity,
     });
+    if (
+      email === '' ||
+      password1 === '' ||
+      password2 === '' ||
+      firstName === '' ||
+      lastName === '' ||
+      age === '' ||
+      gender === '' ||
+      height === '' ||
+      weight === '' ||
+      activity === ''
+    ) {
+      ToastAndroid.show('All fields are required', ToastAndroid.SHORT);
+      return;
+    }
+
+    if (age < 15 || age > 80) {
+      ToastAndroid.show(
+        'Please provide an age between 15 and 80',
+        ToastAndroid.SHORT,
+      );
+      return;
+    }
+
+    if (weight < 1) {
+      ToastAndroid.show('Positive numbers only', ToastAndroid.SHORT);
+      return;
+    }
+    if (height < 1) {
+      ToastAndroid.show('Positive numbers only', ToastAndroid.SHORT);
+      return;
+    }
+
     Axios.post('http://10.0.2.2:8080/register', {
       email: email,
       password1: password1,
       password2: password2,
       firstName: firstName,
       lastName: lastName,
-      age: age,
+      age: +age,
       gender: gender,
-      height: height,
-      weight: weight,
+      height: +height,
+      weight: +weight,
       activity: activity,
     })
       .then(response => {
         console.log(response.data);
+        ToastAndroid.show('Your account has been created', ToastAndroid.SHORT);
         Actions.replace('login');
       })
-      .catch(error => alert(error));
+      .catch(error => {
+        alert(error);
+        console.log(error);
+      });
   };
   return (
     <View style={styles.body}>

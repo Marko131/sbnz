@@ -61,16 +61,6 @@ public class MealService {
         int rules = kieSession.fireAllRules();
         System.out.println("Number of rules" + rules);
 
-        QueryResults results = kieSession.getQueryResults( "people over the age of 30" );
-        System.out.println( "we have " + results.size() + " people over the age  of 30" );
-
-        System.out.println( "These people are are over 30:" );
-
-        for ( QueryResultsRow row : results ) {
-            Meal meal = ( Meal ) row.get( "$meal" );
-            System.out.println( meal.getMealEnum() + "\n" );
-        }
-
         return day;
     }
 

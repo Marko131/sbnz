@@ -17,7 +17,7 @@ public class Ingredient {
     @ManyToOne(cascade={CascadeType.ALL}, fetch=FetchType.EAGER)
     private Food food;
 
-    @Column(nullable = false)
+    @Column
     private double gram;
 
     public Ingredient() {

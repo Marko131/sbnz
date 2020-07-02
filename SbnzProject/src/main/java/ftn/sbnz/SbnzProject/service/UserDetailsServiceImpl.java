@@ -61,6 +61,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    public User updateProfile(User user){
+        KieSession kSession = kieContainer.newKieSession();
+        kSession.insert(user);
+        System.out.println("User before rules: " + user);
+        kSession.fireAllRules();
+        System.out.println("User after rules" + user);
+        return userRepository.save(user);
+    }
+
     public User findUserByEmail(String email){
         return userRepository.findByEmail(email);
     }

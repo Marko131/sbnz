@@ -11,7 +11,7 @@ const MacroProgress = props => {
       <Progress.Bar
         progress={props.progress}
         width={200}
-        color="rgba(0, 255, 152, 1)"
+        color={props.progress > 1 ? '#d50000' : 'rgba(0, 255, 152, 1)'}
         unfilledColor="rgb(0, 106, 63)"
         borderWidth={0}
         width={width}

@@ -1,0 +1,117 @@
+package sbnz.integracija;
+dialect  "mvel"
+
+import ftn.sbnz.SbnzProject.model.UserDay
+import ftn.sbnz.SbnzProject.model.MealRecipe
+import ftn.sbnz.SbnzProject.model.Gender
+import ftn.sbnz.SbnzProject.model.Notification
+import ftn.sbnz.SbnzProject.model.User
+import ftn.sbnz.SbnzProject.model.MealEnum
+
+import java.util.List
+
+declare MealEvent
+    @role(event)
+    @expires(30s)
+    userId: Integer
+    mealEnum: MealEnum
+end
+
+rule "Calories deficit"
+agenda-group "day-rules"
+    when
+        $day: UserDay($meals: mealRecipes, $user: user)
+        Number (doubleValue < $user.getCalories() - 500) from accumulate(
+            MealRecipe(
+                $kcal: calories
+            ) from $meals,
+            sum($kcal)
+        )
+        $notification: Notification()
+    then
+        $notification.addToList("You should not eat less than " + ((int) ($user.getCalories() - 500)) + " calories per day");
+end
+
+rule "Calories surplus"
+agenda-group "day-rules"
+    when
+        $day: UserDay($meals: mealRecipes, $user: user)
+        Number (doubleValue > $user.getCalories() + 500) from accumulate(
+            MealRecipe(
+                $kcal: calories
+            ) from $meals,
+            sum($kcal)
+        )
+        $notification: Notification()
+    then
+        $notification.addToList("You should not eat more than " + ((int) ($user.getCalories() + 500)) + " calories per day");
+end
+
+rule "Amount of sugar Men"
+agenda-group "day-rules"
+    when
+        $day: UserDay($meals: mealRecipes, $user: user, $user.gender == Gender.MALE )
+        Number (doubleValue > 37.5) from accumulate(
+            MealRecipe(
+                $sugar: sugars
+            ) from $meals,
+            sum($sugar)
+        )
+        $notification: Notification()
+    then
+        $notification.addToList("You should not take more than 37.5g of sugar");
+end
+
+rule "Amount of sugar Women"
+agenda-group "day-rules"
+    when
+        $day: UserDay($meals: mealRecipes, $user: user, $user.gender == Gender.FEMALE)
+        Number (doubleValue > 25) from accumulate(
+            MealRecipe(
+                $sugar: sugars
+            ) from $meals,
+            sum($sugar)
+        )
+        $notification: Notification()
+    then
+        $notification.addToList("You should not take more than 25g of sugar");
+end
+
+rule "Saturated fats"
+agenda-group "day-rules"
+    when
+        $day: UserDay($meals: mealRecipes, $user: user )
+        Number (doubleValue > 13) from accumulate(
+            MealRecipe(
+                $sFat: saturatedFat
+            ) from $meals,
+            sum($sFat)
+        )
+        $notification: Notification()
+    then
+    $notification.addToList("You should not take more than 13g of saturated fats");
+end
+
+rule "Add meal"
+when
+    $meal: MealRecipe()
+    $user: User()
+then
+    insert(new MealEvent($user.id, $meal.mealEnum))
+    delete($meal);
+    delete($user);
+end
+
+rule "Wait time"
+when
+    $user: User()
+    $list: List(size > 0) from collect(MealEvent(userId == $user.id))
+    $first: MealEvent() from $list.get(0)
+    MealEvent(mealEnum != $first.mealEnum, userId == $user.id) from $list
+    $notification: Notification($notifications: text not contains "The wait time between meals should be at least 3 hours", user == $user)
+    then
+    delete($user);
+    $notification.addToList("The wait time between meals should be at least 3 hours");
+end
+
+
