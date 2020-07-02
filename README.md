@@ -12,4 +12,4 @@ npm install
 npx react-native run-android
 ```
 
-![Screenshot](https://raw.githubusercontent.com/Marko131/sbnz/master/SbnzMobile/screen.png)
+![Screenshot](https://raw.githubusercontent.com/Marko131/sbnz/master/SbnzMobile/ss.png)
