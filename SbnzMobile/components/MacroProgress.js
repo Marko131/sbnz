@@ -18,7 +18,10 @@ const MacroProgress = props => {
         height={8}
         borderRadius={15}
       />
-      <Text style={styles.text}>{props.grams}g left</Text>
+      <Text style={styles.text}>
+        {props.grams >= 0 ? props.grams : 0 - props.grams}g{' '}
+        {props.grams >= 0 ? 'left' : 'over'}
+      </Text>
     </View>
   );
 };
