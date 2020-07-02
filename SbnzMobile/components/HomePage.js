@@ -80,6 +80,7 @@ const HomePage = () => {
           setDefaultView={() =>
             setView(<MealsContainer day={day} refresh={_retrieveData} />)
           }
+          profile={profile}
         />
       </View>
 

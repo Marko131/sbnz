@@ -5,6 +5,17 @@ import ftn.sbnz.SbnzProject.model.UserDay
 import ftn.sbnz.SbnzProject.model.MealRecipe
 import ftn.sbnz.SbnzProject.model.Gender
 import ftn.sbnz.SbnzProject.model.Notification
+import ftn.sbnz.SbnzProject.model.User
+import ftn.sbnz.SbnzProject.model.MealEnum
+
+import java.util.List
+
+declare MealEvent
+    @role(event)
+    @expires(30s)
+    userId: Integer
+    mealEnum: MealEnum
+end
 
 rule "Calories deficit"
 agenda-group "day-rules"
@@ -80,4 +91,27 @@ agenda-group "day-rules"
     then
     $notification.addToList("You should not take more than 13g of saturated fats");
 end
+
+rule "Add meal"
+when
+    $meal: MealRecipe()
+    $user: User()
+then
+    insert(new MealEvent($user.id, $meal.mealEnum))
+    delete($meal);
+    delete($user);
+end
+
+rule "Wait time"
+when
+    $user: User()
+    $list: List(size > 0) from collect(MealEvent(userId == $user.id))
+    $first: MealEvent() from $list.get(0)
+    MealEvent(mealEnum != $first.mealEnum, userId == $user.id) from $list
+    $notification: Notification($notifications: text not contains "The wait time between meals should be at least 3 hours", user == $user)
+    then
+    delete($user);
+    $notification.addToList("The wait time between meals should be at least 3 hours");
+end
+
 

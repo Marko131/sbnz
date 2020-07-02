@@ -4,6 +4,7 @@ import NavigationItem from './NavigationItem';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Actions} from 'react-native-router-flux';
 import Notifications from './Notifications';
+import Profile from './Profile';
 
 const Navigation = props => {
   const logout = () => {
@@ -15,7 +16,11 @@ const Navigation = props => {
       {/* <NavigationItem icon="chart-bar" /> */}
       <NavigationItem
         icon="account"
-        click={() => ToastAndroid.show('Profile', ToastAndroid.SHORT)}
+        click={() =>
+          props.changeView(
+            <Profile profile={props.profile} refresh={props.refresh} />,
+          )
+        }
       />
       <NavigationItem
         icon="food-variant"

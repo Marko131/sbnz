@@ -47,7 +47,8 @@ const MealsContainer = props => {
     props.refresh();
   };
   return (
-    <SafeAreaView style={{marginTop: 20, flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
+      <Text style={styles.header}> MEALS </Text>
       <ScrollView>{meals}</ScrollView>
 
       <TouchableOpacity
@@ -69,6 +70,14 @@ const MealsContainer = props => {
 };
 
 const styles = StyleSheet.create({
+  header: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 20,
+    padding: 10,
+    textTransform: 'uppercase',
+    fontWeight: 'bold',
+  },
   text: {
     color: 'white',
   },

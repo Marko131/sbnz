@@ -3,17 +3,43 @@ package ftn.sbnz.SbnzProject.dto;
 import ftn.sbnz.SbnzProject.model.Activity;
 import ftn.sbnz.SbnzProject.model.Gender;
 
+import javax.validation.constraints.*;
+
 public class RegisterUserDTO {
 
+    @Email(message = "Required valid email")
     private String email;
+
+    @NotNull
+    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password1;
+
+    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password2;
+
+    @NotNull(message = "First name is required")
     private String firstName;
+
+    @NotNull(message = "Last name is required")
     private String lastName;
-    private int age;
+
+    @NotNull(message = "Age is required")
+    @Min(value = 15, message = "Please provide an age between 15 and 80")
+    @Max(value = 80, message = "Please provide an age between 15 and 80")
+    private Integer age;
+
+    @NotNull(message = "Gender is required")
     private Gender gender;
-    private double height;
-    private double weight;
+
+
+    @NotNull(message = "Height is required")
+    @Positive(message = "Height must be positive number")
+    private Double height;
+
+    @NotNull(message = "Weight is required")
+    private Double weight;
+
+    @NotNull(message = "Activity is required")
     private Activity activity;
 
     public RegisterUserDTO() {

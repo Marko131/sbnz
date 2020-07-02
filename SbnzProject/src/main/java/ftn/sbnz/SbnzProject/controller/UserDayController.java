@@ -53,4 +53,13 @@ public class UserDayController {
         return new ResponseEntity<>(mealRecipes, HttpStatus.OK);
     }
 
+    @GetMapping("/notification")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Notification> getNotification(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userDetailsService.findUserByEmail(email);
+        Notification notification = userDayService.getNotification(user);
+        return new ResponseEntity<>(notification, HttpStatus.OK);
+    }
+
 }

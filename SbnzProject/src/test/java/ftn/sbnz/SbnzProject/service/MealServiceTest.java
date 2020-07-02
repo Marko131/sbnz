@@ -1,7 +1,9 @@
 package ftn.sbnz.SbnzProject.service;
 
+import ftn.sbnz.SbnzProject.exceptions.NotFoundException;
 import ftn.sbnz.SbnzProject.model.*;
 import ftn.sbnz.SbnzProject.repository.DayRepository;
+import ftn.sbnz.SbnzProject.repository.MealRecipeRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -28,6 +30,15 @@ public class MealServiceTest {
     @MockBean
     private DayRepository dayRepository;
 
+    @Autowired
+    private UserDayService userDayService;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private MealRecipeRepository mealRecipeRepository;
+
     @Test
     public void testAddMeal(){
         User testUser = new User();
@@ -42,5 +53,20 @@ public class MealServiceTest {
 
         mealService.addMeal(ingredients, testUser, MealEnum.LUNCH);
         assertEquals(1, testDay.getMeals().size());
+    }
+
+    @Test
+    public void testNotifications() {
+        User u = userDetailsService.findUserByEmail("markostanic@gmail.com");
+        Notification notification = userDayService.getNotification(u);
+        System.out.println(notification);
+    }
+
+    @Test
+    public void testEvent() throws InterruptedException {
+        User u = userDetailsService.findUserByEmail("markostanic@gmail.com");
+        MealRecipe mealRecipe = mealRecipeRepository.findById(1).orElseThrow(()-> new NotFoundException("Not found"));
+        userDayService.testEvent(mealRecipe, u);
+
     }
 }

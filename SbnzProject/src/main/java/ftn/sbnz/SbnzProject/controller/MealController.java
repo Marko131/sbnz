@@ -41,6 +41,7 @@ public class MealController {
         return "OK";
     }
 
+    /*
     @GetMapping("/day")
     @PreAuthorize("hasRole('USER')")
     public Day getDay(){
@@ -49,6 +50,7 @@ public class MealController {
 
         return mealService.getDay(user);
     }
+    */
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")

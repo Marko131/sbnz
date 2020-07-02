@@ -5,6 +5,7 @@ import ftn.sbnz.SbnzProject.model.*;
 import ftn.sbnz.SbnzProject.repository.MealRecipeRepository;
 import ftn.sbnz.SbnzProject.repository.NotificationRepository;
 import ftn.sbnz.SbnzProject.repository.UserDayRepository;
+import org.aspectj.weaver.ast.Not;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,54 +31,75 @@ public class UserDayService {
     @Autowired
     private KieContainer kieContainer;
 
+    @Autowired
+    private SessionService sessionService;
+
     public MealRecipe addMeal(Integer mealID, User user){
         UserDay userDay = userDayRepository.findByDateAndUser(new Date(), user);
         if (userDay == null) userDay = new UserDay(user);
 
         MealRecipe mealRecipe = mealRecipeRepository.findById(mealID).orElseThrow(() -> new NotFoundException("Meal not found"));
         userDay.getMealRecipes().add(mealRecipe);
-
         userDayRepository.save(userDay);
 
-        return mealRecipe;
-        /*
-        ArrayList<Message> messages = new ArrayList<>();
-        KieSession kieSession = kieContainer.newKieSession("meal-session");
-        kieSession.getAgenda().getAgendaGroup("meal").setFocus();
-        d.getMeals().forEach(kieSession::insert);
-        kieSession.insert(messages);
-        kieSession.fireAllRules();
+        Notification notification = new Notification(user);
+        KieSession kieSession = kieContainer.newKieSession("day-session");
+        kieSession.getAgenda().getAgendaGroup("day-rules").setFocus();
+        kieSession.insert(userDay);
+        kieSession.insert(notification);
 
-        messages = distinct(messages);
-        messages.forEach(System.out::println);
-        */
-        //List<Message> messages1 = checkMeal(m);
-        //messages1.forEach(System.out::println);
+        Notification notification1 = checkMeal(userDay, notification);
+
+        kieSession.fireAllRules();
+        notificationRepository.save(notification1);
+
+        testEvent(mealRecipe, user);
+
+        return mealRecipe;
+    }
+
+    private Notification checkMeal(UserDay userDay, Notification notification) {
+        KieSession kieSession = kieContainer.newKieSession("meal-session");
+        kieSession.getAgenda().getAgendaGroup("query").setFocus();
+        userDay.getMealRecipes().forEach(kieSession::insert);
+        kieSession.insert(notification);
+        kieSession.fireAllRules();
+        return notification;
     }
 
     public UserDay getDay(User user) {
         UserDay userDay = userDayRepository.findByDateAndUser(new Date(), user);
         if (userDay == null) userDay = new UserDay(user);
-
-        Notification notification = new Notification();
-
-        KieSession kieSession = kieContainer.newKieSession("day-session");
-        kieSession.getAgenda().getAgendaGroup("day-rules").setFocus();
-        kieSession.insert(userDay);
-
-        kieSession.insert(notification);
-
-        int rules = kieSession.fireAllRules();
-
-        notification.text.forEach(System.out::println);
-        System.out.println("Notifications: " + notification.getText().size());
-
-        System.out.println("Number of rules for day: " + rules);
+        getEvent(user);
         return userDay;
 
     }
 
     public List<MealRecipe> searchMeals(String name) {
         return mealRecipeRepository.findAllByNameContains(name);
+    }
+
+    public Notification getNotification(User user) {
+        getEvent(user);
+        return notificationRepository.findFirstByDateAndUserOrderByIdDesc(new Date(), user);
+
+    }
+
+    public void testEvent(MealRecipe mealRecipe, User user)  {
+        KieSession kieSession = sessionService.getKieSession();
+        kieSession.insert(mealRecipe);
+        kieSession.insert(user);
+        kieSession.fireAllRules();
+    }
+
+    public void getEvent(User user){
+        KieSession kieSession = sessionService.getKieSession();
+        kieSession.insert(user);
+        Notification notification = notificationRepository.findFirstByDateAndUserOrderByIdDesc(new Date(), user);
+        if (notification == null)
+            notification = new Notification(user);
+        kieSession.insert(notification);
+        kieSession.fireAllRules();
+        notification.text.forEach(System.out::println);
     }
 }

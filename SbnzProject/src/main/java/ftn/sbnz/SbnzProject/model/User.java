@@ -116,6 +116,7 @@ public class User {
         this.height = height;
     }
 
+
     public double getWeight() {
         return weight;
     }
@@ -123,6 +124,7 @@ public class User {
     public void setWeight(double weight) {
         this.weight = weight;
     }
+
 
     public double getBmi() {
         return bmi;

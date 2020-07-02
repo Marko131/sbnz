@@ -2,6 +2,7 @@ package ftn.sbnz.SbnzProject.model;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.kie.api.definition.type.Position;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -41,9 +42,11 @@ public class MealRecipe {
     private double carbohydrates;
 
     @Column
+    @Position(0)
     private double sugars;
 
     @Column
+    @Position(1)
     private double saturatedFat;
 
 

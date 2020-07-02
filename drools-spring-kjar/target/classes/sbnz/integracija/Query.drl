@@ -1,14 +1,28 @@
 package sbnz.integracija;
 dialect  "mvel"
 
-import ftn.sbnz.SbnzProject.model.Meal
+import ftn.sbnz.SbnzProject.model.MealRecipe
+import ftn.sbnz.SbnzProject.model.Notification
+import java.util.List
+
+
+query sugarMax(Double s)
+    MealRecipe(sugars > s)
+end
+
+query saturatedFatMax(Double s)
+    MealRecipe(saturatedFat > s)
+end
 
 rule "Query"
+agenda-group "query"
     when
+        $meal: MealRecipe()
+        sugarMax(15.0;)
+        saturatedFatMax(9.0;)
+        $notification: Notification()
     then
-        System.out.println("test query");
+        $notification.addToList("You should avoid " + $meal.name);
+        delete($meal);
 end
 
-query "people over the age of 30"
-    $meal : Meal(getId() > 5)
-end

@@ -1,11 +1,7 @@
 package ftn.sbnz.SbnzProject.controller;
 
-import ftn.sbnz.SbnzProject.dto.DroolsDTO;
-import ftn.sbnz.SbnzProject.dto.LoginUserDTO;
-import ftn.sbnz.SbnzProject.dto.RegisterUserDTO;
-import ftn.sbnz.SbnzProject.dto.UserProfileDTO;
+import ftn.sbnz.SbnzProject.dto.*;
 import ftn.sbnz.SbnzProject.exceptions.PasswordsDoNotMatchException;
-import ftn.sbnz.SbnzProject.model.Day;
 import ftn.sbnz.SbnzProject.model.User;
 import ftn.sbnz.SbnzProject.security.TokenUtils;
 import ftn.sbnz.SbnzProject.service.MealService;
@@ -81,7 +77,7 @@ public class UserController {
     public ResponseEntity<UserProfileDTO> profile(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userDetailsService.findUserByEmail(email);
-        Day day = mealService.getDay(user);
+        //Day day = mealService.getDay(user);
 
         UserProfileDTO userProfileDTO = new UserProfileDTO(
                 user.getEmail(),
@@ -98,6 +94,36 @@ public class UserController {
                 user.getActivity()
         );
         return new ResponseEntity<UserProfileDTO>(userProfileDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/profile")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<UserProfileDTO> updateProfile(@Valid @RequestBody UpdateProfileDTO updateProfileDTO) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userDetailsService.findUserByEmail(email);
+
+        user.setAge(updateProfileDTO.getAge());
+        user.setHeight(updateProfileDTO.getHeight());
+        user.setWeight(updateProfileDTO.getWeight());
+        user.setActivity(updateProfileDTO.getActivity());
+
+        User updated = userDetailsService.updateProfile(user);
+
+        UserProfileDTO userProfileDTO = new UserProfileDTO(
+                updated.getEmail(),
+                updated.getFirstName(),
+                updated.getLastName(),
+                updated.getAge(),
+                updated.getGender(),
+                updated.getHeight(),
+                updated.getWeight(),
+                updated.getBmi(),
+                updated.getBodyStatus(),
+                updated.getBmr(),
+                updated.getCalories(),
+                updated.getActivity()
+        );
+        return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
     }
 
 

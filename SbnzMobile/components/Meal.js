@@ -18,8 +18,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     backgroundColor: 'rgba(255, 255, 255, .2)',
     borderRadius: 20,
-    marginVertical: 5,
-    paddingVertical: 5,
+    marginVertical: 10,
+    paddingVertical: 10,
     paddingHorizontal: 20,
   },
   header: {
