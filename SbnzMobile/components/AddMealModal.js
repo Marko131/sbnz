@@ -19,6 +19,7 @@ const AddMealModal = props => {
   const [meals, setMeals] = useState([]);
 
   const searchMeals = async () => {
+    if (searchValue == '') return;
     const value = await AsyncStorage.getItem('access_token');
     if (value !== null) {
       Axios.get(`http://10.0.2.2:8080/day/meal/search/${searchValue}`, {

@@ -3,26 +3,54 @@ dialect  "mvel"
 
 import ftn.sbnz.SbnzProject.model.MealRecipe
 import ftn.sbnz.SbnzProject.model.Notification
+import ftn.sbnz.SbnzProject.model.Meals
 import java.util.List
 
 
-query sugarMax(Double s)
-    MealRecipe(sugars > s)
+query sugarMax(Integer mealId, Double s)
+    MealRecipe(id == mealId, sugars > s)
 end
 
-query saturatedFatMax(Double s)
-    MealRecipe(saturatedFat > s)
+query saturatedFatMax(Integer mealId, Double s)
+    MealRecipe(id == mealId, saturatedFat > s)
 end
 
 rule "Query"
 agenda-group "query"
     when
-        $meal: MealRecipe()
-        sugarMax(15.0;)
-        saturatedFatMax(9.0;)
+        $meal: MealRecipe($id: id)
+        sugarMax($id, 15.0;)
+        saturatedFatMax($id, 9.0;)
         $notification: Notification()
     then
         $notification.addToList("You should avoid " + $meal.name);
         delete($meal);
+end
+
+rule "Sort"
+salience $maxSugar - $s + $maxSatFat - $f
+agenda-group "sort"
+    when
+        $meal: MealRecipe($s: sugars, $f: saturatedFat)
+        $list: List(size > 0) from collect(MealRecipe())
+        $possibleMeals: Meals()
+        $minSugar : Double() from accumulate(
+                 MealRecipe( $sugar: sugars ) from $list,
+                 min( $sugar ) )
+
+        $maxSugar : Double() from accumulate(
+                         MealRecipe( $sugar: sugars ) from $list,
+                         max( $sugar ) )
+
+        $minSatFat : Double() from accumulate(
+                         MealRecipe( $sFat: saturatedFat ) from $list,
+                         min( $sFat ) )
+
+        $maxSatFat : Double() from accumulate(
+                         MealRecipe( $sFat: saturatedFat ) from $list,
+                         max( $sFat ) )
+
+    then
+        $possibleMeals.addMeal($meal);
 end
 
