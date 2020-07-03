@@ -76,7 +76,9 @@ public class UserDayService {
     }
 
     public List<MealRecipe> searchMeals(String name) {
-        return mealRecipeRepository.findAllByNameContains(name);
+        List<MealRecipe> mealRecipes = mealRecipeRepository.findAllByNameContains(name);
+        List<MealRecipe> sorted = sortMealRecipes(mealRecipes);
+        return sorted;
     }
 
     public Notification getNotification(User user) {
@@ -101,5 +103,15 @@ public class UserDayService {
         kieSession.insert(notification);
         kieSession.fireAllRules();
         notification.text.forEach(System.out::println);
+    }
+
+    private List<MealRecipe> sortMealRecipes(List<MealRecipe> mealRecipes){
+        KieSession kieSession = kieContainer.newKieSession("meal-session");
+        kieSession.getAgenda().getAgendaGroup("sort").setFocus();
+        mealRecipes.forEach(kieSession::insert);
+        Meals meals = new Meals();
+        kieSession.insert(meals);
+        kieSession.fireAllRules();
+        return meals.getMealRecipeArrayList();
     }
 }

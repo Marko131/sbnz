@@ -102,16 +102,22 @@ then
     delete($user);
 end
 
+query checkDifferentMeals(List allMeals)
+     $first: MealEvent() from allMeals.get(0)
+     MealEvent(mealEnum != $first.mealEnum) from allMeals
+end
+
+
 rule "Wait time"
 when
     $user: User()
     $list: List(size > 0) from collect(MealEvent(userId == $user.id))
-    $first: MealEvent() from $list.get(0)
-    MealEvent(mealEnum != $first.mealEnum, userId == $user.id) from $list
+    checkDifferentMeals($list;)
     $notification: Notification($notifications: text not contains "The wait time between meals should be at least 3 hours", user == $user)
     then
     delete($user);
     $notification.addToList("The wait time between meals should be at least 3 hours");
 end
+
 
 

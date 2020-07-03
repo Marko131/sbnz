@@ -7,6 +7,7 @@ import org.kie.api.definition.type.Position;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table
@@ -166,5 +167,13 @@ public class MealRecipe {
 
     public void setSaturatedFat(double saturatedFat) {
         this.saturatedFat = saturatedFat;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MealRecipe that = (MealRecipe) o;
+        return Objects.equals(getId(), that.getId());
     }
 }
