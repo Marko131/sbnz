@@ -39,16 +39,16 @@ agenda-group "sort"
                  min( $sugar ) )
 
         $maxSugar : Double() from accumulate(
-                         MealRecipe( $sugar: sugars ) from $list,
-                         max( $sugar ) )
+                     MealRecipe( $sugar: sugars ) from $list,
+                     max( $sugar ) )
 
         $minSatFat : Double() from accumulate(
-                         MealRecipe( $sFat: saturatedFat ) from $list,
-                         min( $sFat ) )
+                     MealRecipe( $sFat: saturatedFat ) from $list,
+                     min( $sFat ) )
 
         $maxSatFat : Double() from accumulate(
-                         MealRecipe( $sFat: saturatedFat ) from $list,
-                         max( $sFat ) )
+                     MealRecipe( $sFat: saturatedFat ) from $list,
+                     max( $sFat ) )
 
     then
         $possibleMeals.addMeal($meal);

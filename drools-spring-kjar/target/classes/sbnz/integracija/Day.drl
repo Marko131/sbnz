@@ -119,5 +119,13 @@ when
     $notification.addToList("The wait time between meals should be at least 3 hours");
 end
 
-
+rule "Wait time 2"
+when
+    $user: User()
+    not (MealEvent(userId == $user.id) over window:time(15s))
+    $notification: Notification($notifications: text not contains "The wait time between meals should not be more than 6 hours", user == $user)
+    then
+    delete($user);
+    $notification.addToList("The wait time between meals should not be more than 6 hours");
+end
 

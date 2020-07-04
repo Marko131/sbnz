@@ -103,6 +103,7 @@ public class UserDayService {
         kieSession.insert(notification);
         kieSession.fireAllRules();
         notification.text.forEach(System.out::println);
+        notificationRepository.save(notification);
     }
 
     private List<MealRecipe> sortMealRecipes(List<MealRecipe> mealRecipes){

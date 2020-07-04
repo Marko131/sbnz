@@ -1,0 +1,9 @@
+package sbnz.integracija;
+dialect  "mvel"
+
+rule "new rule"
+when
+then 
+    System.out.println("new rule");
+end
+

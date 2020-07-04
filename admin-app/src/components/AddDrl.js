@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import Axios from "axios";
 
 const AddDrl = () => {
   const [fileName, setFileName] = useState("");
   const [text, setText] = useState("");
 
   const submit = () => {
-    console.log(fileName);
-    console.log(text);
+    Axios.post("http://localhost:8080/drl", {
+      fileName: fileName,
+      text: text,
+    }).then((response) => alert("Rule has been successfully added"));
   };
 
   return (
